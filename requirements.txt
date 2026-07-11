@@ -28,8 +28,9 @@ shap
 matplotlib
 seaborn
 
-# --- Notebooks / interactive dev ---
-jupyter
+# --- Interactive dev (VS Code notebooks / interactive window) ---
+# ipykernel only: VS Code's Jupyter extension supplies the notebook UI itself,
+# so we skip the heavy `jupyter` / JupyterLab metapackage we won't use.
 ipykernel
 
 # --- Hyperparameter search (used later in the model zoo) ---

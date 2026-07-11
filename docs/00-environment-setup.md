@@ -68,8 +68,14 @@ To upgrade deliberately: edit `requirements.txt`, reinstall, re-freeze the lock.
 | shap | 0.49.1 | model explainability (Step 6) |
 | matplotlib | 3.9.4 | base plotting |
 | seaborn | 0.13.2 | statistical plots on top of matplotlib |
-| jupyter + ipykernel | — | interactive notebooks in VS Code |
+| ipykernel | 6.31.0 | run cells against this venv in VS Code notebooks / interactive window |
 | optuna | 4.9.0 | hyperparameter search (Step 4–5 tuning) |
+
+**Why `ipykernel` only (not the full `jupyter`)?** VS Code's Jupyter extension supplies
+the notebook UI itself; it just needs a *kernel* to execute against — that's `ipykernel`.
+The `jupyter` metapackage would drag in JupyterLab + the classic notebook server + ~50
+extra packages we'd never use. Trimming it took the locked dependency count from **166
+down to 112**. If you later want classic JupyterLab in a browser, add `jupyterlab` back.
 
 ## 4. Verifying the install
 
