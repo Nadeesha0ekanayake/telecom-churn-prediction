@@ -52,6 +52,31 @@ Sample output (8 customers):
 New month-to-month customers score high; long-tenure two-year contracts near zero — the
 model behaves exactly as the SHAP story predicted.
 
+## Which data did we score? (evaluation vs. demo — important)
+
+A model split into train/test raises a fair question: *which base did we run inference on?*
+
+| Split | Rows | Used for |
+|---|---|---|
+| **train** (80%) | 5,634 | fitting the model + 5-fold cross-**validation** (folds = validation) |
+| **test** (20%) | 1,409 | held-out **evaluation**: all metrics, ROC/confusion, cost-threshold (0.20), segmentation, SHAP |
+
+- The model is **fit on train only** — including in registration (`pipe.fit(X_train, ...)`).
+  Every *performance number* in this project was computed on the **held-out test set**, so
+  the evaluation is clean (no leakage).
+- **The inference demo is different.** `scripts/08_batch_inference.py` samples 8 rows from
+  the **entire raw base** (`raw.sample(8)`), so some scored rows were **in the training
+  set**. That is intentional and fine **for demonstrating the serving *mechanics*** (does
+  the registered model load, take raw rows, and return predictions?) — but it is **not a
+  performance measurement**. Scoring training rows would look optimistically good.
+- **In production**, inference runs on genuinely **new, unseen** customers — the equivalent
+  of scoring the test split here. To make the demo mirror that, sample the demo rows from
+  the test split instead of the full base (a couple of lines; deliberately left as-is here
+  since the demo only needs to prove the plumbing).
+
+**Summary:** evaluation = held-out test (honest); inference demo = random sample of the
+full base (fine to show the pipeline works, overlaps training data by design).
+
 ## 4. Real-time REST serving — `mlflow models serve`
 
 ```bash
