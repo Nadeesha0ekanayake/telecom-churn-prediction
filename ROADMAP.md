@@ -72,5 +72,6 @@ deliberately trying **multiple options at each stage** to understand how things 
 - [x] Step 3 · Baseline + MLflow setup (`docs/03-baseline-model.md`)
 - [x] Step 4–5 · Model zoo (`docs/04-model-zoo.md`) — selected `logreg_balanced` (CV AUC 0.846)
 - [x] Step 6 · SHAP interpretation (`docs/06-shap-interpretation.md`)
-- [ ] Step 7 · Business angle
+- [x] Step 7 · Business angle (`docs/07-business-angle.md`) — optimal threshold 0.20, 548 priority customers
+- [ ] S1 · MLflow inference (register model, batch + local REST)
 - [ ] Path β · Databricks traversal
