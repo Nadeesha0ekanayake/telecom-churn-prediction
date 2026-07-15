@@ -117,3 +117,58 @@ and REST-served model**. All logged in MLflow, all in `src/` (env-agnostic).
 Run the *same* `src/` logic from Databricks notebooks; the only real changes are
 `mlflow.set_tracking_uri("databricks")` and Databricks Model Serving in place of the local
 REST server. A port-and-compare exercise.
+
+---
+
+## Appendix · Productionisation: folding `prepare()` into the pipeline
+
+**Today, transformation happens in two places:**
+
+```
+raw CSV row
+   │  phase 1: prepare() = clean() + add_features()   ← plain pandas, OUTSIDE the pipeline
+   ▼
+prepared row (22 feature columns)
+   │  phase 2: the sklearn Pipeline                    ← THIS is what we saved & registered
+   ▼        ColumnTransformer (scale + one-hot) → LogisticRegression
+prediction
+```
+
+Only **phase 2** is inside the saved model, so the registered model expects
+**post-`prepare` input**. Callers must run `prepare()` first (which is why
+`inference.score()` does, and why the REST payload used post-prepare columns).
+
+**The improvement — put `prepare()` inside the pipeline too:**
+
+```python
+full = Pipeline([
+    ("prepare", PrepareTransformer()),   # clean() + add_features() as a transformer
+    ("pre",     column_transformer),      # scale + one-hot
+    ("clf",     estimator),
+])
+# saved model = [ clean → add_features → scale/encode → classifier ]
+```
+
+Now the artifact accepts a **fully raw** CSV row and does everything internally.
+
+**Why it's a production win:**
+1. **One artifact, one source of truth** — the transform logic travels with the model; no
+   separate pre-step to forget.
+2. **No train/serve skew** — preprocessing lives inside the model, so it can't be
+   re-implemented differently at serving time (a classic production bug).
+3. **Simple serving everywhere** — REST, batch, and Databricks (Path β) all just send raw
+   rows; no need to re-implement `prepare()` per environment.
+4. **The model signature becomes the raw schema** — what real callers actually have.
+
+**Why we haven't done it yet (trade-offs):**
+- **Clarity for learning** — keeping `prepare()` separate made each transform easy to see,
+  run, and explain step by step.
+- **A little care needed** — the wrapper must be a module-level class (not a lambda) so the
+  model can be un-pickled/loaded later, and `get_feature_names_out` needs handling so SHAP
+  still shows readable names.
+- **Safe to add anytime** — `clean()`/`add_features()` are already stateless and
+  deterministic (no leakage), so moving them inside changes *packaging*, not *results*.
+
+**In one line:** the model is currently "bring me cleaned, engineered rows"; the
+improvement makes it "bring me raw customer rows and I'll handle the rest" — the robust
+form for a deployed service. Candidate to do on Path α polish or when porting to Path β.
