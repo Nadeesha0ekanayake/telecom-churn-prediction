@@ -71,6 +71,6 @@ deliberately trying **multiple options at each stage** to understand how things 
 - [x] Step 2 · Cleaning & Feature Engineering (`docs/02-cleaning-feature-engineering.md`)
 - [x] Step 3 · Baseline + MLflow setup (`docs/03-baseline-model.md`)
 - [x] Step 4–5 · Model zoo (`docs/04-model-zoo.md`) — selected `logreg_balanced` (CV AUC 0.846)
-- [ ] Step 6 · SHAP interpretation
+- [x] Step 6 · SHAP interpretation (`docs/06-shap-interpretation.md`)
 - [ ] Step 7 · Business angle
 - [ ] Path β · Databricks traversal
