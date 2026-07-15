@@ -73,5 +73,5 @@ deliberately trying **multiple options at each stage** to understand how things 
 - [x] Step 4–5 · Model zoo (`docs/04-model-zoo.md`) — selected `logreg_balanced` (CV AUC 0.846)
 - [x] Step 6 · SHAP interpretation (`docs/06-shap-interpretation.md`)
 - [x] Step 7 · Business angle (`docs/07-business-angle.md`) — optimal threshold 0.20, 548 priority customers
-- [ ] S1 · MLflow inference (register model, batch + local REST)
+- [x] S1 · MLflow inference (`docs/08-inference.md`) — registered `telecom-churn@champion`, batch + REST serving ✅ Path α complete
 - [ ] Path β · Databricks traversal

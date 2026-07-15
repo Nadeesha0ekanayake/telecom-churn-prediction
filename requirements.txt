@@ -35,3 +35,7 @@ ipykernel
 
 # --- Hyperparameter search (used later in the model zoo) ---
 optuna
+
+# --- Model serving (MLflow REST endpoint: `mlflow models serve`) ---
+uvicorn
+fastapi
