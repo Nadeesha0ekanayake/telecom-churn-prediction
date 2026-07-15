@@ -7,6 +7,7 @@ predicted probabilities, so it's our primary model-selection metric.
 from __future__ import annotations
 
 import matplotlib
+import numpy as np
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -84,4 +85,41 @@ def plot_confusions(results: dict, y_test, fname: str = "06_baseline_confusion.p
             ax=ax, colorbar=False, cmap="Blues"
         )
         ax.set_title(name, fontsize=10)
+    return _save(fig, fname)
+
+
+def plot_metric_bars(
+    results: dict,
+    metrics=("roc_auc", "f1", "recall", "precision"),
+    fname: str = "08_zoo_metrics.png",
+):
+    """Grouped bar chart of test metrics across all models."""
+    names = list(results)
+    x = np.arange(len(names))
+    width = 0.8 / len(metrics)
+    fig, ax = plt.subplots(figsize=(max(8, 1.6 * len(names)), 5))
+    for i, m in enumerate(metrics):
+        ax.bar(x + i * width, [results[n]["test"][m] for n in names], width, label=m)
+    ax.set_xticks(x + width * (len(metrics) - 1) / 2)
+    ax.set_xticklabels(names, rotation=15, ha="right")
+    ax.set(ylim=(0, 1), ylabel="test score", title="Model zoo — test metrics")
+    ax.legend(ncol=len(metrics), loc="lower right")
+    return _save(fig, fname)
+
+
+def plot_feature_importance(pipeline, top_n: int = 15,
+                            fname: str = "09_feature_importance.png"):
+    """Native feature importance (trees) or |coef| (linear) for a fitted pipeline."""
+    pre = pipeline.named_steps["pre"]
+    clf = pipeline.named_steps["clf"]
+    names = pre.get_feature_names_out()
+    if hasattr(clf, "feature_importances_"):
+        importance = clf.feature_importances_
+    else:
+        importance = np.abs(clf.coef_).ravel()
+    order = np.argsort(importance)[::-1][:top_n][::-1]
+    fig, ax = plt.subplots(figsize=(7, 6))
+    ax.barh([names[i] for i in order], [importance[i] for i in order])
+    ax.set_title(f"Top {top_n} features — {type(clf).__name__}")
+    fig.tight_layout()
     return _save(fig, fname)
