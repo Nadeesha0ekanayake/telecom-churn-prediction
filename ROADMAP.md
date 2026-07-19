@@ -74,4 +74,4 @@ deliberately trying **multiple options at each stage** to understand how things 
 - [x] Step 6 · SHAP interpretation (`docs/06-shap-interpretation.md`)
 - [x] Step 7 · Business angle (`docs/07-business-angle.md`) — optimal threshold 0.20, 548 priority customers
 - [x] S1 · MLflow inference (`docs/08-inference.md`) — registered `telecom-churn@champion`, batch + REST serving ✅ Path α complete
-- [ ] Path β · Databricks traversal
+- [x] Path β · Databricks traversal (`docs/09-pathb-databricks.md`) — Steps 1–6 + batch serving reproduced with managed MLflow (matches Path α); real-time endpoint left as reference ✅
